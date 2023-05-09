@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="it-it">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chess</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        <link rel="icon" type="image/x-icon" href="favicon.ico" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" integrity="sha512-TU/clvRaSqKB43MX6dvJPEWV8tEGDTbmT4mdxTs6DSYsBY9zKmiw4Qeykp0nS10ndH14HRNG2VWN+IjiMfA17Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    <body>
+        <nav class="navbar navbar-dark navbar-expand-lg bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">
+                    Chess
+                </a>
+
+                <div class="collapse navbar-collapse">
+                    <div class="navbar-nav">
+                        <a class="nav-link active" href="#welcome">Benvenuto</a>
+                        <a class="nav-link active" href="#create-game">Nuova Partita</a>
+                        <a class="nav-link active" href="#join-game">Partecipa</a>
+                        <a class="nav-link active" href="#games">Partite Disponibili</a>
+                        <a class="nav-link active" href="#credits">Crediti</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container col-6">
+            <div class="row row-cols-1 row-cols-md-1 g-4 m-1">
+                <div class="col">
+                    <div class="alert alert-primary" role="alert">
+                        Chess è Attualmente in Beta!
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-1 g-4 m-1">
+                <div class="col">
+                    <a name="welcome"></a>
+
+                    <div class="card">
+                        <div class="card-header">
+                            Benvenuto!
+                        </div>
+
+                        <div class="card-body">
+                            <div class="alert alert-warning" role="alert">
+                                Partita Privata!
+                            </div>
+
+                            <div class="input-group">
+                                <input type="text" id="username" class="form-control" placeholder="Username" />
+
+                                <button class="btn btn-outline-secondary" type="button" onclick="generateUsername()">
+                                    Genera!
+                                </button>
+                            </div>
+
+                            <div class="card-text mt-3">
+                                <a href="https://www.chess.com/it/regole-scacchi" class="card-link" target="_blank">
+                                    Come Giocare?
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          
+            <div class="row row-cols-1 row-cols-md-2 g-4 m-1">
+                <div class="col">
+                    <a name="create-game"></a>
+
+                    <div class="card">
+                        <div class="card-header">
+                            Nuova Partita
+                        </div>
+
+                        <div class="card-body">
+                            <select class="form-select" id="type">
+                                <option value="public">
+                                    Pubblica
+                                </option>
+
+                                <option value="private">
+                                    Privata
+                                </option>
+                            </select>
+
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="button" class="btn btn-primary input-block-level" onclick="createGame()">
+                                    Nuova Partita
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <a name="join-game"></a>
+
+                    <div class="card">
+                        <div class="card-header">
+                            Partecipa
+                        </div>
+
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <input type="text" id="id" class="form-control" placeholder="Codice Partita">
+                                
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyId()">
+                                    Copia!
+                                </button>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="button" class="btn btn-primary input-block-level" onclick="joinGame()">
+                                    Partecipa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-1 g-4 m-1">
+                <div class="col">
+                    <a name="games"></a>
+
+                    <div class="card">
+                        <div class="card-header">
+                            Partite Disponibili
+                        </div>
+
+                        <div class="card-body">
+                            <p class="card-text">
+                                Clicca una Partita per Selezionare Automaticamente il Codice!
+                                <br />
+                                Le Partite Verranno Rimosse dopo 24 Ore.
+                            </p>
+                        </div>
+
+                        <ul id="games" class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="alert alert-danger mt-3">
+                                    Errore! Impossibile Comunicare con il Server!
+                                </div>
+                            </li>
+
+                            <!--
+                            <li class="list-group-item"></li>
+                            -->
+                        </ul>
+
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary input-block-level" onclick="getGames()">
+                                    Aggiorna
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-1 g-4 m-1">
+                <div class="col">
+                    <a name="credits"></a>
+
+                    <div class="card">
+                        <div class="card-header">
+                            Crediti
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="" class="card-link">Bootstrap</a>
+                            </li>
+
+                            <li class="list-group-item">
+                                <a href="" class="card-link">Chessboard.js</a>
+                            </li>
+
+                            <li class="list-group-item">
+                                <a href="" class="card-link">Chess.js</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4"></div>
+        </div>
+
+        <script src="app.js"></script>
+
+        <script type="text/javascript">
+            getGames();
+
+            generateUsername();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js" integrity="sha384-s3XgLpvmHyscVpijnseAmye819Ee3yaGa8NxstkJVyA6nuDFjt59u1QvuEl/mecz" crossorigin="anonymous"></script>
+    </body>
+</html>

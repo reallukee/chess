@@ -1,6 +1,6 @@
 function generateUsername()
 {
-    var username = document.getElementById('username');
+    var usernameCtrl = document.getElementById('username');
 
     var temp = "";
 
@@ -11,7 +11,7 @@ function generateUsername()
         temp += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    username.value = temp;
+    usernameCtrl.value = temp;
 }
         
 function copyId()
@@ -28,7 +28,20 @@ function createGame()
     var usernameControl = document.getElementById('username');
     var idControl = document.getElementById('id');
 
-    let url = 'https://classe5ID.altervista.org/games/partita/chess_' + usernameControl.value;
+    let url = 'https://classe5ID.altervista.org/games/partita/';
+
+    var gameTypeControl = document.getElementById('gameType');
+
+    if (gameTypeControl.value == "public")
+    {
+        url += 'chess_' + usernameControl.value;
+    }
+
+    if (gameTypeControl.value == "private")
+    {
+        url += '$chess_' + usernameControl.value;
+    }
+
     var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
 
     fetch(url, { headers : auth, method : "POST" })
@@ -36,9 +49,12 @@ function createGame()
         .then(result => {
             idControl.value = result.data.id;
 
+            idControl.dataset.id = idControl.value;
+            idControl.dataset.username = username.value;
+
             getGames();
         })
-        .catch(error => alert(error))
+        .catch(error => console.log(error))
 }
 
 function joinGame()
@@ -46,24 +62,51 @@ function joinGame()
     var usernameControl = document.getElementById('username');
     var idControl = document.getElementById('id');
 
-    let url = 'https://classe5ID.altervista.org/games/join/' + id.value + '/' + username.value;
-    var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
-                
-    fetch(url, { headers : auth, method : "POST" })
-        .then(response => response.json())
-        .then(result => {
-            if (result != null)
-            {
-                window.location.href = 'play.html?id=' + idControl.value + '&username=' + usernameControl.value;
-            }
-        })
-        .catch(error => alert(error))
+    if (usernameControl.value == idControl.dataset.username)
+    {
+        alert("Error!");
+    }
+    else
+    {
+        let url = 'https://classe5ID.altervista.org/games/join/' + id.value + '/' + username.value;
+        var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
+                    
+        fetch(url, { headers : auth, method : "POST" })
+            .then(response => response.json())
+            .then(result => {
+                if (result != null)
+                {
+                    window.location.href = 'play.html?id=' + idControl.value + '&username=' + usernameControl.value;
+                }
+            })
+            .catch(error => console.log(error))
+    }
+}
+
+
+
+function gameTypeChange()
+{
+    var gameTypeControl = document.getElementById('gameType');
+    var gameTypeAlertControl = document.getElementById('gameTypeAlert');
+
+    if (gameTypeControl.value == 'public')
+    {
+        gameTypeAlertControl.hidden = true;
+    }
+
+    if (gameTypeControl.value == 'private')
+    {
+        gameTypeAlertControl.hidden = false;
+    }
 }
 
 
 
 function getGames()
 {
+    var usernameControl = document.getElementById('username');
+
     let url = 'https://classe5ID.altervista.org/games/partita';
     var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
 
@@ -83,8 +126,24 @@ function getGames()
                         ' data-id=' + result.data[i].ID +
                         ' data-username=' + result.data[i].PLAYER1.replace("chess_", "") +
                         ' onClick="selectGame(this)">' +
-                        result.data[i].ID + ' ' + result.data[i].PLAYER1.replace("chess_", "") +
+                        'Partita di <b>' + result.data[i].PLAYER1.replace("chess_", "") + '</b>' +
+                        ' con ID <b>' + result.data[i].ID + '</b>' +
                         '</li>' + gamesControls.innerHTML;
+                }
+
+                if (result.data[i].PLAYER1.startsWith("$chess_"))
+                {
+                    if (result.data[i].PLAYER1.replace("$chess_", "") == usernameControl.value)
+                    {
+                        gamesControls.innerHTML =
+                            '<li class="list-group-item text-bg-warning"' +
+                            ' data-id=' + result.data[i].ID +
+                            ' data-username=' + result.data[i].PLAYER1.replace("$chess_", "") +
+                            ' onClick="selectGame(this)">' +
+                            'Partita di <b>' + result.data[i].PLAYER1.replace("$chess_", "") + '</b>' +
+                            ' con ID <b>' + result.data[i].ID + '</b> (Questa Partita è Privata)' +
+                            '</li>' + gamesControls.innerHTML;
+                    }
                 }
             }
 
@@ -98,7 +157,7 @@ function getGames()
                     '</li>';
             }
         })
-        .catch(error => alert(error))
+        .catch(error => console.log(error))
 }
 
 
@@ -108,6 +167,9 @@ function selectGame(control)
     var idControl = document.getElementById('id');
 
     idControl.value = control.dataset.id;
+
+    idControl.dataset.id = control.dataset.id;
+    idControl.dataset.username = control.dataset.username;
 }
 
 
@@ -132,7 +194,8 @@ function getMoves()
                 {
                     movesControl.innerHTML +=
                         '<li class="list-group-item">' +
-                        result.data.moves[i].MOSSA + ' ' + result.data.moves[i].PLAYER +
+                        result.data.moves[i].MOSSA + ' ' +
+                        result.data.moves[i].PLAYER +
                         '</li>';
                 }
             }
@@ -140,14 +203,14 @@ function getMoves()
             if (movesControl.innerHTML == "")
             {
                 movesControl.innerHTML +=
-                    '<li class="list-group-item"' +
+                    '<li class="list-group-item">' +
                     '<div class="alert alert-danger mt-3">' +
                     'Nessuna Mossa Disponibile!' +
                     '</div>' +
                     '</li>';
             }
         })
-        .catch(error => alert(error))
+        .catch(error => console.log(error))
 }
                     
 function getLastMove()
@@ -161,31 +224,29 @@ function getLastMove()
         .then(response => response.json())
         .then(result => {
             console.log(result);
-            
-            lastMoveControl.innerHTML =
-                '<li class="list-group-item"' +
-                ' data-id=' + '' + 
-                ' data-username=' + '' +
-                ' onClick="">' +
-                result.data.play.MOSSA + ' ' + result.data.play.PLAYER +
-                '</li>';
 
-            result.data.play.MOSSA.replaceAll('_', '/');
-        })
-        .catch(error => console.log(error))
-}
+            if (result.data.play.MOSSA == null)
+            {
+                lastMoveControl.innerHTML +=
+                    '<li class="list-group-item">' +
+                    '<div class="alert alert-danger mt-3">' +
+                    'Nessuna Mossa Disponibile!' +
+                    '</div>' +
+                    '</li>';
+            }
+            else
+            {
+                lastMoveControl.innerHTML =
+                    '<li class="list-group-item"' +
+                    ' data-id=' + '' + 
+                    ' data-username=' + '' +
+                    ' onClick="">' +
+                    result.data.play.MOSSA + ' ' +
+                    result.data.play.PLAYER +
+                    '</li>';
+            }
 
-function update()
-{
-    let url = 'https://classe5ID.altervista.org/games/mossa/' + id;
-    var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
-            
-    fetch(url, { headers : auth })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-
-            return result.data.play.MOSSA.replaceAll('_', '/');
+            localStorage.setItem('lastMove', result.data.play.MOSSA);
         })
         .catch(error => console.log(error))
 }

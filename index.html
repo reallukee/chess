@@ -17,7 +17,11 @@
                     Chess
                 </a>
 
-                <div class="collapse navbar-collapse">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div id="navbar" class="collapse navbar-collapse">
                     <div class="navbar-nav">
                         <a class="nav-link active" href="#welcome">Benvenuto</a>
                         <a class="nav-link active" href="#create-game">Nuova Partita</a>
@@ -30,6 +34,7 @@
         </nav>
 
         <div class="container col-6">
+            <!--
             <div class="row row-cols-1 row-cols-md-1 g-4 m-1">
                 <div class="col">
                     <div class="alert alert-primary" role="alert">
@@ -37,6 +42,7 @@
                     </div>
                 </div>
             </div>
+            -->
 
             <div class="row row-cols-1 row-cols-md-1 g-4 m-1">
                 <div class="col">
@@ -48,8 +54,12 @@
                         </div>
 
                         <div class="card-body">
-                            <div class="alert alert-warning" role="alert">
+                            <div id="gameTypeAlert" class="alert alert-warning" role="alert" hidden>
                                 Partita Privata!
+                                <br />
+                                Una Partita Privata è Visibile solo al Giocatore che l'ha Creata.
+                                <br />
+                                Non Dimenticare il Codice Partita!
                             </div>
 
                             <div class="input-group">
@@ -80,7 +90,7 @@
                         </div>
 
                         <div class="card-body">
-                            <select class="form-select" id="type">
+                            <select id="gameType" class="form-select" onchange="gameTypeChange()">
                                 <option value="public">
                                     Pubblica
                                 </option>
@@ -137,9 +147,11 @@
 
                         <div class="card-body">
                             <p class="card-text">
-                                Clicca una Partita per Selezionare Automaticamente il Codice!
+                                Clicca una Partita per Selezionare Automaticamente l'ID!
                                 <br />
                                 Le Partite Verranno Rimosse dopo 24 Ore.
+                                <br />
+                                Verranno Visualizzate solo le Partite Private da te Create!
                             </p>
                         </div>
 

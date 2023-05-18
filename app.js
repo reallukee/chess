@@ -50,9 +50,14 @@ function createGame()
             idControl.value = result.data.id;
 
             idControl.dataset.id = idControl.value;
-            idControl.dataset.username = username.value;
+            idControl.dataset.username = usernameControl.value;
 
             getGames();
+
+            if (result != null)
+            {
+                window.location.href = 'play.html?id=' + idControl.value + '&username=' + usernameControl.value;
+            }
         })
         .catch(error => console.log(error))
 }
@@ -62,25 +67,32 @@ function joinGame()
     var usernameControl = document.getElementById('username');
     var idControl = document.getElementById('id');
 
+    if (idControl.value == "")
+    {
+        return;
+    }
+
     if (usernameControl.value == idControl.dataset.username)
     {
-        alert("Error!");
+        return;
     }
-    else
-    {
-        let url = 'https://classe5ID.altervista.org/games/join/' + id.value + '/' + username.value;
-        var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
-                    
-        fetch(url, { headers : auth, method : "POST" })
-            .then(response => response.json())
-            .then(result => {
-                if (result != null)
-                {
-                    window.location.href = 'play.html?id=' + idControl.value + '&username=' + usernameControl.value;
-                }
-            })
-            .catch(error => console.log(error))
-    }
+
+    let url = 'https://classe5ID.altervista.org/games/join/' + idControl.value + '/chess_' + usernameControl.value;
+    var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
+                        
+    fetch(url, { headers : auth, method : "POST" })
+        .then(response => response.json())
+        .then(result => {
+            if (result != null)
+            {
+                window.location.href = 'play.html?id=' + idControl.value + '&username=' + usernameControl.value;
+            }
+            else
+            {
+                alert('CANE DIO!');
+            }
+        })
+        .catch(error => console.log(error))
 }
 
 
@@ -102,6 +114,45 @@ function gameTypeChange()
 }
 
 
+
+function getAllGames()
+{
+    var usernameControl = document.getElementById('username');
+
+    let url = 'https://classe5ID.altervista.org/games/partita';
+    var auth = { "Authorization" : `Basic ${btoa("4ID:Grena")}` };
+
+    fetch(url, { headers : auth })
+        .then(response => response.json())
+        .then(result => {
+            var gamesControls = document.getElementById('games');
+
+            gamesControls.innerHTML = "";
+
+            for (var i = 0; i < result.data.length; i++)
+            {
+                gamesControls.innerHTML =
+                    '<li class="list-group-item"' +
+                    ' data-id=' + result.data[i].ID +
+                    ' data-username=' + result.data[i].PLAYER1.replace("chess_", "") +
+                    ' onClick="selectGame(this)">' +
+                    'Partita di <b>' + result.data[i].PLAYER1.replace("chess_", "") + '</b>' +
+                    ' con ID <b>' + result.data[i].ID + '</b>' +
+                    '</li>' + gamesControls.innerHTML;
+            }
+
+            if (gamesControls.innerHTML == "")
+            {
+                gamesControls.innerHTML +=
+                    '<li class="list-group-item">' +
+                    '<div class="alert alert-danger mt-3">' +
+                    'Nessuna Partita Disponibile! Crea una Nuova Partita!' +
+                    '</div>' +
+                    '</li>';
+            }
+        })
+        .catch(error => console.log(error))
+}
 
 function getGames()
 {
@@ -192,10 +243,15 @@ function getMoves()
             {
                 if (result.data.moves[i])
                 {
+                    var fen = result.data.moves[i].MOSSA;
+                    
+                    fen = fen.replaceAll('_', '/');
+                    fen = fen.replaceAll('?', ' ');
+
                     movesControl.innerHTML +=
                         '<li class="list-group-item">' +
-                        result.data.moves[i].MOSSA + ' ' +
-                        result.data.moves[i].PLAYER +
+                        'Mossa <b>' + fen + '</b>' +
+                        ' di <b>' + result.data.moves[i].PLAYER + '</b>' +
                         '</li>';
                 }
             }
@@ -223,7 +279,7 @@ function getLastMove()
     fetch(url, { headers : auth })
         .then(response => response.json())
         .then(result => {
-            console.log(result);
+            // console.log(result);
 
             if (result.data.play.MOSSA == null)
             {
@@ -236,17 +292,20 @@ function getLastMove()
             }
             else
             {
+                var fen = result.data.play.MOSSA;
+
+                fen = fen.replaceAll('_', '/');
+                fen = fen.replaceAll('?', ' ');
+
                 lastMoveControl.innerHTML =
                     '<li class="list-group-item"' +
                     ' data-id=' + '' + 
                     ' data-username=' + '' +
                     ' onClick="">' +
-                    result.data.play.MOSSA + ' ' +
-                    result.data.play.PLAYER +
+                    'Mossa <b>' + fen + '</b>' +
+                    ' di <b>' + result.data.play.PLAYER + '</b>' +
                     '</li>';
             }
-
-            localStorage.setItem('lastMove', result.data.play.MOSSA);
         })
         .catch(error => console.log(error))
 }
